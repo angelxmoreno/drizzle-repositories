@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# If the first argument is present, use it as the question.
+if [ -n "$1" ]; then
+  claude "$1" --dangerously-skip-permissions
+else
+  claude --dangerously-skip-permissions
+fi
