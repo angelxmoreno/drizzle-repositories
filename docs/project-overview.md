@@ -252,12 +252,12 @@ services:
  *   }
  * }
  * ```
-*
-* @since 0.1.0
-  */
-  export abstract class BaseRepository<TTable, TSelect, TInsert> {
+ * 
+ * @since 0.1.0
+ */
+export abstract class BaseRepository<TTable, TSelect, TInsert> {
   // Implementation...
-  }
+}
 ```
 
 ## 🔨 Development Tooling
@@ -281,7 +281,7 @@ pre-commit:
     type-check:
       run: tsc --noEmit
     test:
-      run: npm test
+      run: bun test
 
 commit-msg:
   commands:
@@ -297,7 +297,7 @@ commit-msg:
 - **CLI Binary**: `dist/cli.js`
 - **TypeScript Definitions**: Full `.d.ts` file generation
 - **Peer Dependencies**: `drizzle-orm >= 0.28.0`
-  **Node Version**: `>= 18.0.0` (matching modern JavaScript runtime support)
+- **Node Version**: `>= 18.0.0` (matching modern JavaScript runtime support)
 - **Bun Test Runner**: Comprehensive test suite with Bun's fast test runner
 
 ### Publishing Strategy
@@ -354,53 +354,8 @@ export class UserRepository extends BaseUserRepository {
 }
 ```
 
-## 📋 Implementation Checklist
-
-### Phase 1: Foundation
-- [ ] Project setup with tooling (Biome, Lefthook, TypeScript)
-- [ ] Core type definitions and configuration system
-- [ ] Basic CLI structure with Commander.js
-- [ ] Docker Compose setup for test databases
-
-### Phase 2: Core Logic
-- [ ] Schema file parsing and table discovery
-- [ ] Template generation system
-- [ ] Base repository class implementations
-- [ ] Dialect-specific repository classes
-
-### Phase 3: Code Generation
-- [ ] File generation logic with safety checks
-- [ ] CLI command implementations
-- [ ] Configuration file validation
-- [ ] Error handling and logging
-
-### Phase 4: Dependency Injection
-- [ ] TSyringe container setup
-- [ ] Repository module configuration
-- [ ] Factory function alternatives
-- [ ] Container isolation testing
-
-### Phase 5: Testing & Documentation
-- [ ] Comprehensive test suite across all dialects
-- [ ] Integration tests with real databases
-- [ ] TypeDoc documentation generation
-- [ ] Example projects and usage guides
-
-### Phase 6: Polish & Distribution
-- [ ] NPM package configuration
-- [ ] GitHub Actions CI/CD
-- [ ] README and contributing guidelines
-- [ ] Version 0.1.0 release preparation
-
-## 🎯 Success Criteria
-
-1. **Multi-dialect Support**: All three databases (PostgreSQL, MySQL, SQLite) fully supported
-2. **Type Safety**: 100% TypeScript compatibility with proper IntelliSense
-3. **Zero Configuration**: Works out-of-the-box with sensible defaults
-4. **Developer Experience**: Intuitive CLI, clear error messages, comprehensive docs
-5. **Production Ready**: Full test coverage, proper error handling, performance optimized
-6. **Community Ready**: Open source with contribution guidelines and examples
-
 ---
 
 **This project overview serves as the complete specification for building the Drizzle Repository Codegen Framework. All architectural decisions, technical requirements, and implementation details are documented above for development execution.**
+
+For implementation tasks and progress tracking, see [tasks.md](./tasks.md).
