@@ -8,7 +8,7 @@ This document tracks the implementation progress of the Drizzle Repository Codeg
 - [X] Project setup with tooling (Biome, Lefthook, TypeScript)
 - [ ] Core type definitions and configuration system
 - [ ] Basic CLI structure with Commander.js
-- [ ] Docker Compose setup for test databases
+- [X] Docker Compose setup for test databases
 
 ### Phase 2: Core Logic
 - [ ] Schema file parsing and table discovery

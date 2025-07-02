@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: drizzle-postgres
+    environment:
+      POSTGRES_DB: drizzle_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - drizzle_repositories_postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d drizzle_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: drizzle-mariadb
+    environment:
+      MARIADB_DATABASE: drizzle_test
+      MARIADB_USER: test_user
+      MARIADB_PASSWORD: test_password
+      MARIADB_ROOT_PASSWORD: root_password
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - drizzle_repositories_mariadb_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  drizzle_repositories_postgres_data:
+    driver: local
+  drizzle_repositories_mariadb_data:
+    driver: local
