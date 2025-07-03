@@ -10,11 +10,12 @@ Type-safe, extensible repository classes for Drizzle ORM with multi-dialect supp
 
 - **🤖 Automatic Code Generation**: Zero boilerplate - generate complete repository classes from your Drizzle schemas
 - **🚀 Multi-dialect Support**: PostgreSQL, MySQL, and SQLite
-- **🔒 Type Safety**: Leverages Drizzle's `InferSelectModel` and `InferInsertModel`
+- **🔒 Type Safety**: Leverages Drizzle's `InferSelectModel` and `InferInsertModel` with native SQL expressions
 - **🏗️ Three-Layer Architecture**: Base → Generated → Custom repositories
 - **💉 Dependency Injection**: TSyringe-based with sub-container isolation
 - **⚡ Built with Bun**: Fast development and testing experience
 - **🎯 Zero Configuration**: Works out-of-the-box with sensible defaults
+- **🔍 Native Drizzle Integration**: Uses Drizzle's SQL expressions and database types directly
 
 ## 📦 Installation
 
@@ -41,12 +42,13 @@ console.log(repo.hello()); // "Hello from Drizzle Repositories!"
 ### Configuration Example
 
 ```typescript
-import type { RepositoryConfig } from 'drizzle-repositories';
+import type { RepositoryCodegenConfig } from 'drizzle-repositories';
 
-const config: RepositoryConfig = {
+const config: RepositoryCodegenConfig = {
   dialect: 'pg',
   schemaPath: './src/schema/*.ts',
-  outputPath: './src/repositories/generated'
+  outputPath: './src/repositories/generated',
+  basePath: './src/repositories/base'
 };
 ```
 
@@ -85,9 +87,9 @@ Layer 3: UserRepository (developer's custom queries, never overwritten)
 
 ### Supported Dialects
 
-- **PostgreSQL**: `RETURNING` clause support, `ON CONFLICT` handling
-- **MySQL**: `ON DUPLICATE KEY UPDATE` support, MySQL-specific optimizations
-- **SQLite**: Simplified transaction handling, file-based operations
+- **PostgreSQL**: Native `NodePgDatabase` types, `RETURNING` clause support, `ON CONFLICT` handling
+- **MySQL**: Native `MySql2Database` types, `ON DUPLICATE KEY UPDATE` support, MySQL-specific optimizations  
+- **SQLite**: Native `BetterSQLite3Database` types, simplified transaction handling, file-based operations
 
 ## 🛠️ Development
 

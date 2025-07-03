@@ -91,9 +91,6 @@ export interface RepositoryCodegenConfig {
 
     /** Optional: Generation feature flags */
     features?: {
-        /** Generate soft delete methods */
-        softDelete?: boolean;
-
         /** Generate relationship loading methods */
         relationships?: boolean;
 
@@ -228,7 +225,6 @@ export interface DefaultConfigValues {
 
     /** Default feature flags */
     readonly features: {
-        readonly softDelete: true;
         readonly relationships: false;
         readonly auditTrail: false;
         readonly validation: false;

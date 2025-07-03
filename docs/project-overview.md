@@ -7,7 +7,7 @@ A standalone NPM package that generates type-safe, extensible repository classes
 ## 🎯 Core Objectives
 
 - **Multi-dialect Support**: PostgreSQL, MySQL, and SQLite
-- **Type Safety**: Leverages Drizzle's `InferSelectModel` and `InferInsertModel`
+- **Type Safety**: Leverages Drizzle's `InferSelectModel` and `InferInsertModel` with native SQL expressions
 - **Three-Layer Architecture**: Base → Generated → Custom repositories
 - **Dependency Injection**: TSyringe-based with sub-container isolation
 - **Developer Experience**: Epic documentation, intuitive CLI, proper TypeScript integration
@@ -99,6 +99,14 @@ export interface RepositoryCodegenConfig {
     defaultLimit: number;
     maxLimit: number;
   };
+  
+  /** Optional: Generation feature flags */
+  features?: {
+    relationships?: boolean;
+    auditTrail?: boolean;
+    validation?: boolean;
+    caching?: boolean;
+  };
 }
 ```
 
@@ -110,34 +118,31 @@ All repositories inherit these methods:
 
 ```typescript
 // Query Methods
-findById(id: number|string|Record<string, number|string>, tx?: Transaction): Promise<T | null>
-findFirst(where: Partial<T>, tx?: Transaction): Promise<T | null>
-findMany(where?: Partial<T>, options?: QueryOptions, tx?: Transaction): Promise<T[]>
-findPaginated(where?: Partial<T>, page?: number, limit?: number, tx?: Transaction): Promise<PaginatedResult<T>>
+findById(options: { id: PrimaryKey, tx?: Transaction }): Promise<T | null>
+findFirst(options: { where?: SQL, tx?: Transaction }): Promise<T | null>
+findMany(options?: { where?: SQL, limit?: number, offset?: number, tx?: Transaction }): Promise<T[]>
+findPaginated(options?: { where?: SQL, page?: number, limit?: number, tx?: Transaction }): Promise<PaginatedResult<T>>
 
 // Existence & Counting
-exists(where: Partial<T>, tx?: Transaction): Promise<boolean>
-count(where?: Partial<T>, tx?: Transaction): Promise<number>
+exists(options: { where: SQL, tx?: Transaction }): Promise<boolean>
+count(options?: { where?: SQL, tx?: Transaction }): Promise<number>
 
 // Mutation Methods
-save(data: InsertType<T>, tx?: Transaction): Promise<T>
-update(id: PrimaryKey, data: Partial<UpdateType<T>>, tx?: Transaction): Promise<T>
-remove(id: PrimaryKey, tx?: Transaction): Promise<void>
-upsert(data: UpsertType<T>, tx?: Transaction): Promise<T>
-
-// Soft Delete Support (when deletedAt column exists)
-softDelete(id: PrimaryKey, tx?: Transaction): Promise<void>
-restore(id: PrimaryKey, tx?: Transaction): Promise<void>
+save(options: { data: InsertType<T>, tx?: Transaction }): Promise<T>
+update(options: { id: PrimaryKey, data: Partial<InsertType<T>>, tx?: Transaction }): Promise<T>
+remove(options: { id: PrimaryKey, tx?: Transaction }): Promise<void>
+upsert(options: { where: SQL, create: InsertType<T>, update: Partial<InsertType<T>>, tx?: Transaction }): Promise<T>
 
 // Extensibility
 loadRelations(entities: T[], tx?: Transaction): Promise<T[]>
+transaction<T>(fn: (tx: Transaction) => Promise<T>): Promise<T>
 ```
 
 ### Dialect-Specific Features
 
-- **PostgreSQL**: `RETURNING` clause support, `ON CONFLICT` handling
-- **MySQL**: `ON DUPLICATE KEY UPDATE` support, MySQL-specific optimizations
-- **SQLite**: Simplified transaction handling, file-based operations
+- **PostgreSQL**: Native `NodePgDatabase` types, `RETURNING` clause support, `ON CONFLICT` handling
+- **MySQL**: Native `MySql2Database` types, `ON DUPLICATE KEY UPDATE` support, MySQL-specific optimizations
+- **SQLite**: Native `BetterSQLite3Database` types, simplified transaction handling, file-based operations
 
 ## 🛠️ CLI Interface
 

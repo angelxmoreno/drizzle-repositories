@@ -8,6 +8,8 @@
  * @since 0.1.0
  */
 
+import type { InferInsertModel, InferSelectModel, SQL, Table } from 'drizzle-orm';
+
 /**
  * Supported database dialects for repository generation.
  *
@@ -50,7 +52,7 @@ export type PrimaryKey = number | string | Record<string, number | string>;
  */
 export interface Transaction {
     /** Execute a query within the transaction context */
-    execute: (query: unknown) => Promise<unknown>;
+    execute: (query: SQL) => Promise<unknown>;
 
     /** Rollback the transaction */
     rollback: () => Promise<void>;
@@ -60,38 +62,39 @@ export interface Transaction {
 }
 
 /**
- * Query options for customizing database operations.
- *
- * Provides flexible configuration for sorting, limiting, and controlling
- * query behavior across all repository methods.
- *
- * @example
- * ```typescript
- * const options: QueryOptions = {
- *   orderBy: [{ field: 'createdAt', direction: 'desc' }],
- *   limit: 20,
- *   offset: 0,
- *   includeDeleted: false
- * };
- * ```
+ * Base query options for repository operations.
  *
  * @since 0.1.0
  */
-export interface QueryOptions {
-    /** Sorting configuration */
-    orderBy?: Array<{
-        field: string;
-        direction: 'asc' | 'desc';
-    }>;
+export interface BaseQueryOptions {
+    /** Optional transaction context */
+    tx?: Transaction;
+}
 
+/**
+ * Query options for find operations.
+ *
+ * @since 0.1.0
+ */
+export interface FindOptions extends BaseQueryOptions {
     /** Maximum number of records to return */
     limit?: number;
 
     /** Number of records to skip */
     offset?: number;
+}
 
-    /** Include soft-deleted records in results */
-    includeDeleted?: boolean;
+/**
+ * Pagination query options.
+ *
+ * @since 0.1.0
+ */
+export interface PaginationOptions extends BaseQueryOptions {
+    /** Page number (1-based, defaults to 1) */
+    page?: number;
+
+    /** Items per page */
+    limit?: number;
 }
 
 /**
@@ -153,188 +156,119 @@ export interface PaginatedResult<T> {
  * generated repository classes.
  *
  * @template TTable - The Drizzle table type
- * @template TSelect - The inferred select model type
- * @template TInsert - The inferred insert model type
- * @template TUpdate - The inferred update model type (optional, defaults to Partial<TInsert>)
  *
  * @since 0.1.0
  */
-export interface IRepository<_TTable = unknown, TSelect = unknown, TInsert = unknown, TUpdate = Partial<TInsert>> {
+export interface IRepository<TTable extends Table> {
     // Query Methods
 
     /**
      * Find a single entity by its primary key.
      *
-     * @param id - The primary key value(s)
-     * @param tx - Optional transaction context
+     * @param options - Query options including id and transaction
      * @returns Promise resolving to the entity or null if not found
      */
-    findById(id: PrimaryKey, tx?: Transaction): Promise<TSelect | null>;
+    findById(options: { id: PrimaryKey } & BaseQueryOptions): Promise<InferSelectModel<TTable> | null>;
 
     /**
      * Find the first entity matching the given criteria.
      *
-     * @param where - Partial entity for filtering
-     * @param tx - Optional transaction context
+     * @param options - Query options including where clause and transaction
      * @returns Promise resolving to the first matching entity or null
      */
-    findFirst(where: Partial<TSelect>, tx?: Transaction): Promise<TSelect | null>;
+    findFirst(options: { where?: SQL } & BaseQueryOptions): Promise<InferSelectModel<TTable> | null>;
 
     /**
      * Find multiple entities matching the given criteria.
      *
-     * @param where - Optional partial entity for filtering
-     * @param options - Optional query configuration
-     * @param tx - Optional transaction context
+     * @param options - Query options including where clause, limit, offset, and transaction
      * @returns Promise resolving to array of matching entities
      */
-    findMany(where?: Partial<TSelect>, options?: QueryOptions, tx?: Transaction): Promise<TSelect[]>;
+    findMany(options?: { where?: SQL } & FindOptions): Promise<InferSelectModel<TTable>[]>;
 
     /**
      * Find entities with pagination support.
      *
-     * @param where - Optional partial entity for filtering
-     * @param page - Page number (1-based, defaults to 1)
-     * @param limit - Items per page (defaults to configuration value)
-     * @param tx - Optional transaction context
+     * @param options - Pagination options including where clause, page, limit, and transaction
      * @returns Promise resolving to paginated result
      */
-    findPaginated(
-        where?: Partial<TSelect>,
-        page?: number,
-        limit?: number,
-        tx?: Transaction
-    ): Promise<PaginatedResult<TSelect>>;
+    findPaginated(options?: { where?: SQL } & PaginationOptions): Promise<PaginatedResult<InferSelectModel<TTable>>>;
 
     // Existence & Counting
 
     /**
      * Check if any entity exists matching the given criteria.
      *
-     * @param where - Partial entity for filtering
-     * @param tx - Optional transaction context
+     * @param options - Query options including where clause and transaction
      * @returns Promise resolving to boolean indicating existence
      */
-    exists(where: Partial<TSelect>, tx?: Transaction): Promise<boolean>;
+    exists(options: { where: SQL } & BaseQueryOptions): Promise<boolean>;
 
     /**
      * Count entities matching the given criteria.
      *
-     * @param where - Optional partial entity for filtering
-     * @param tx - Optional transaction context
+     * @param options - Query options including where clause and transaction
      * @returns Promise resolving to count of matching entities
      */
-    count(where?: Partial<TSelect>, tx?: Transaction): Promise<number>;
+    count(options?: { where?: SQL } & BaseQueryOptions): Promise<number>;
 
     // Mutation Methods
 
     /**
      * Create and save a new entity.
      *
-     * @param data - Entity data for creation
-     * @param tx - Optional transaction context
+     * @param options - Options including entity data and transaction
      * @returns Promise resolving to the created entity
      */
-    save(data: TInsert, tx?: Transaction): Promise<TSelect>;
+    save(options: { data: InferInsertModel<TTable> } & BaseQueryOptions): Promise<InferSelectModel<TTable>>;
 
     /**
      * Update an existing entity by its primary key.
      *
-     * @param id - The primary key value(s)
-     * @param data - Partial entity data for update
-     * @param tx - Optional transaction context
+     * @param options - Options including id, data, and transaction
      * @returns Promise resolving to the updated entity
      */
-    update(id: PrimaryKey, data: TUpdate, tx?: Transaction): Promise<TSelect>;
+    update(
+        options: { id: PrimaryKey; data: Partial<InferInsertModel<TTable>> } & BaseQueryOptions
+    ): Promise<InferSelectModel<TTable>>;
 
     /**
      * Delete an entity by its primary key.
      *
-     * @param id - The primary key value(s)
-     * @param tx - Optional transaction context
+     * @param options - Options including id and transaction
      * @returns Promise resolving when deletion is complete
      */
-    remove(id: PrimaryKey, tx?: Transaction): Promise<void>;
+    remove(options: { id: PrimaryKey } & BaseQueryOptions): Promise<void>;
 
     /**
      * Insert or update an entity (upsert operation).
      *
-     * @param data - Entity data for upsert
-     * @param tx - Optional transaction context
+     * @param options - Options including where condition, create data, update data, and transaction
      * @returns Promise resolving to the upserted entity
      */
-    upsert(data: TInsert, tx?: Transaction): Promise<TSelect>;
+    upsert(
+        options: {
+            where: SQL;
+            create: InferInsertModel<TTable>;
+            update: Partial<InferInsertModel<TTable>>;
+        } & BaseQueryOptions
+    ): Promise<InferSelectModel<TTable>>;
 }
 
 /**
- * Extended repository interface with soft delete support.
- *
- * This interface extends the base repository with soft delete functionality
- * for entities that have a deletedAt timestamp column.
- *
- * @template TTable - The Drizzle table type
- * @template TSelect - The inferred select model type
- * @template TInsert - The inferred insert model type
- * @template TUpdate - The inferred update model type
+ * Repository instance configuration options.
  *
  * @since 0.1.0
  */
-export interface ISoftDeleteRepository<
-    TTable = unknown,
-    TSelect = unknown,
-    TInsert = unknown,
-    TUpdate = Partial<TInsert>,
-> extends IRepository<TTable, TSelect, TInsert, TUpdate> {
-    /**
-     * Soft delete an entity by setting its deletedAt timestamp.
-     *
-     * @param id - The primary key value(s)
-     * @param tx - Optional transaction context
-     * @returns Promise resolving when soft deletion is complete
-     */
-    softDelete(id: PrimaryKey, tx?: Transaction): Promise<void>;
+export interface RepositoryInstanceConfig {
+    /** Transaction timeout in milliseconds */
+    transactionTimeout?: number;
 
-    /**
-     * Restore a soft-deleted entity by clearing its deletedAt timestamp.
-     *
-     * @param id - The primary key value(s)
-     * @param tx - Optional transaction context
-     * @returns Promise resolving when restoration is complete
-     */
-    restore(id: PrimaryKey, tx?: Transaction): Promise<void>;
-}
+    /** Default pagination limit */
+    defaultLimit?: number;
 
-/**
- * Repository factory configuration for creating repository instances.
- *
- * Provides configuration options for repository creation including
- * database connection, table reference, and behavioral settings.
- *
- * @template TTable - The Drizzle table type
- *
- * @since 0.1.0
- */
-export interface RepositoryFactoryConfig<TTable = unknown> {
-    /** Database connection instance */
-    db: unknown;
-
-    /** Drizzle table reference */
-    table: TTable;
-
-    /** Optional configuration overrides */
-    config?: {
-        /** Transaction timeout in milliseconds */
-        transactionTimeout?: number;
-
-        /** Default pagination limit */
-        defaultLimit?: number;
-
-        /** Maximum allowed pagination limit */
-        maxLimit?: number;
-
-        /** Enable soft delete functionality */
-        softDelete?: boolean;
-    };
+    /** Maximum allowed pagination limit */
+    maxLimit?: number;
 }
 
 /**
@@ -363,9 +297,6 @@ export interface RepositoryMetadata {
 
     /** Configuration used for generation */
     configHash: string;
-
-    /** Whether soft delete is enabled */
-    hasSoftDelete: boolean;
 
     /** Primary key column information */
     primaryKey: {

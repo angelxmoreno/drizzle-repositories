@@ -126,3 +126,7 @@ directories, and generation options.
 - Before writing any code, explicitly quote the relevant sections that justify your approach
 - Never deviate from documented file structures, naming conventions, or documentation standards
 - When in doubt, ask rather than assume
+
+## Working Notes
+
+- When done, give me time to review before you commit

@@ -8,6 +8,9 @@
  * @since 0.1.0
  */
 
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import type { MySql2Database } from 'drizzle-orm/mysql2';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { DatabaseDialect, Transaction } from './repository.js';
 
 /**
@@ -25,13 +28,7 @@ export namespace PostgreSQL {
      *
      * @since 0.1.0
      */
-    export interface Database {
-        /** Execute a query and return results */
-        execute: (query: unknown) => Promise<unknown>;
-
-        /** Begin a new transaction */
-        transaction: <T>(fn: (tx: PostgreSQLTransaction) => Promise<T>) => Promise<T>;
-    }
+    export type Database<TSchema extends Record<string, unknown> = Record<string, never>> = NodePgDatabase<TSchema>;
 
     /**
      * PostgreSQL transaction type with PostgreSQL-specific features.
@@ -101,13 +98,7 @@ export namespace MySQL {
      *
      * @since 0.1.0
      */
-    export interface Database {
-        /** Execute a query and return results */
-        execute: (query: unknown) => Promise<unknown>;
-
-        /** Begin a new transaction */
-        transaction: <T>(fn: (tx: MySQLTransaction) => Promise<T>) => Promise<T>;
-    }
+    export type Database<TSchema extends Record<string, unknown> = Record<string, never>> = MySql2Database<TSchema>;
 
     /**
      * MySQL transaction type with MySQL-specific features.
@@ -174,19 +165,8 @@ export namespace SQLite {
      *
      * @since 0.1.0
      */
-    export interface Database {
-        /** Execute a query and return results */
-        run: (query: unknown) => Promise<unknown>;
-
-        /** Get query results */
-        all: (query: unknown) => Promise<unknown[]>;
-
-        /** Get single result */
-        get: (query: unknown) => Promise<unknown>;
-
-        /** Begin a new transaction */
-        transaction: <T>(fn: (tx: SQLiteTransaction) => Promise<T>) => Promise<T>;
-    }
+    export type Database<TSchema extends Record<string, unknown> = Record<string, never>> =
+        BetterSQLite3Database<TSchema>;
 
     /**
      * SQLite transaction type with SQLite-specific features.
@@ -234,13 +214,13 @@ export namespace SQLite {
      */
     export interface ImportPaths {
         /** Main drizzle-orm SQLite import */
-        database: 'drizzle-orm/better-sqlite3' | 'drizzle-orm/bun-sqlite' | 'drizzle-orm/libsql';
+        database: 'drizzle-orm/better-sqlite3';
 
         /** SQLite-specific operators and functions */
         operators: 'drizzle-orm/sqlite-core';
 
         /** Connection library */
-        client: 'better-sqlite3' | 'bun:sqlite' | '@libsql/client';
+        client: 'better-sqlite3';
     }
 }
 

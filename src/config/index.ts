@@ -37,7 +37,6 @@ export const DEFAULT_CONFIG: DefaultConfigValues = {
         usePascalCase: true,
     },
     features: {
-        softDelete: true,
         relationships: false,
         auditTrail: false,
         validation: false,
@@ -297,7 +296,6 @@ export function applyDefaults(config: RepositoryCodegenConfig): RepositoryCodege
             additionalImports: config.imports?.additionalImports ?? [],
         },
         features: {
-            softDelete: config.features?.softDelete ?? DEFAULT_CONFIG.features.softDelete,
             relationships: config.features?.relationships ?? DEFAULT_CONFIG.features.relationships,
             auditTrail: config.features?.auditTrail ?? DEFAULT_CONFIG.features.auditTrail,
             validation: config.features?.validation ?? DEFAULT_CONFIG.features.validation,
@@ -374,7 +372,6 @@ export function createExampleConfig(dialect: DatabaseDialect): RepositoryCodegen
             maxLimit: 100,
         },
         features: {
-            softDelete: true,
             relationships: false,
             auditTrail: false,
             validation: false,

@@ -8,7 +8,7 @@ export {
     validateConfig,
 } from './config/index.js';
 // Export base repository classes
-export { BaseRepository, BaseSoftDeleteRepository } from './repositories/base/BaseRepository.js';
+export { BaseRepository } from './repositories/base/BaseRepository.js';
 // Export CLI types
 export type { CLIOptions } from './types/cli.js';
 // Export configuration types and functions
@@ -40,13 +40,14 @@ export type {
 export { createDialectImportTemplate } from './types/dialects.js';
 // Export core repository types
 export type {
+    BaseQueryOptions,
     DatabaseDialect,
+    FindOptions,
     IRepository,
-    ISoftDeleteRepository,
     PaginatedResult,
+    PaginationOptions,
     PrimaryKey,
-    QueryOptions,
-    RepositoryFactoryConfig,
+    RepositoryInstanceConfig,
     RepositoryMetadata,
     Transaction,
 } from './types/repository.js';
