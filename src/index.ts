@@ -1,4 +1,8 @@
-console.log('Hello via Bun!');
+// Export CLI functionality
+export { createCLI, main } from './cli/index.js';
+
+// Export types
+export type { CLIOptions, RepositoryCodegenConfig } from './types/cli.js';
 
 // Placeholder exports for NPM module structure
 export interface RepositoryConfig {

@@ -50,6 +50,24 @@ const config: RepositoryConfig = {
 };
 ```
 
+### CLI Usage
+
+Generate repository classes from your Drizzle schema:
+
+```bash
+# Initialize configuration file
+npx drizzle-repositories init
+
+# Generate repositories from schema
+npx drizzle-repositories generate
+
+# Validate existing repositories
+npx drizzle-repositories validate
+
+# Generate with options
+npx drizzle-repositories generate --config ./my-config.ts --verbose --dry-run
+```
+
 ## 🏗️ Architecture
 
 ### Three-Layer Repository Pattern
@@ -194,8 +212,8 @@ See [docs/tasks.md](./docs/tasks.md) for detailed implementation progress.
 ### Phase 1: Foundation ✅
 - [x] Project setup with tooling (Biome, Lefthook, TypeScript)
 - [ ] Core type definitions and configuration system
-- [ ] Basic CLI structure with Commander.js
-- [ ] Docker Compose setup for test databases
+- [x] Basic CLI structure with Commander.js
+- [x] Docker Compose setup for test databases
 
 ### Upcoming Phases
 - **Phase 2**: Core Logic (Schema parsing, Template generation)
