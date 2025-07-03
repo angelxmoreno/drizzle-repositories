@@ -211,7 +211,7 @@ See [docs/tasks.md](./docs/tasks.md) for detailed implementation progress.
 
 ### Phase 1: Foundation ✅
 - [x] Project setup with tooling (Biome, Lefthook, TypeScript)
-- [ ] Core type definitions and configuration system
+- [x] Core type definitions and configuration system
 - [x] Basic CLI structure with Commander.js
 - [x] Docker Compose setup for test databases
 
