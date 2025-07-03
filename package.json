@@ -36,7 +36,11 @@
         "check-types": "tsc --noEmit",
         "lint": "biome check .",
         "lint:fix": "biome check --write .",
-        "ci": "bun run lint && bun run check-types && bun test"
+        "ci": "bun run lint && bun run check-types && bun test",
+        "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+        "docker:down": "docker compose -f docker/docker-compose.yml down",
+        "docker:logs": "docker compose -f docker/docker-compose.yml logs",
+        "docker:clean": "docker compose -f docker/docker-compose.yml down -v"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.0.6",
