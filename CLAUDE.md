@@ -1,4 +1,3 @@
-
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -103,3 +102,6 @@ The system uses `repository.codegen.config.ts` for configuration with dialect se
 - Maintain type safety throughout the codebase
 - Use proper JSDoc documentation for generated code
 - Handle errors gracefully with informative messages
+
+### Git Workflow
+- Do not do git add until I review the code
